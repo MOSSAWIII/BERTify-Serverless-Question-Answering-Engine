@@ -1,188 +1,68 @@
-# 🧠 BERTify: Serverless Question-Answering Engine
+# BERTify — Serverless Question-Answering Prototype
 
-[![AWS Lambda](https://img.shields.io/badge/AWS-Lambda-orange.svg)](https://aws.amazon.com/lambda/)
-[![HuggingFace](https://img.shields.io/badge/🤗-Transformers-yellow.svg)](https://huggingface.co/transformers)
-[![Docker](https://img.shields.io/badge/Docker-Container-blue.svg)](https://www.docker.com/)
-[![Serverless](https://img.shields.io/badge/Serverless-Framework-red.svg)](https://www.serverless.com/)
-[![Python 3.8](https://img.shields.io/badge/Python-3.8-green.svg)](https://www.python.org/)
-[![MIT License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
+**Python · Hugging Face Transformers · PyTorch · Docker · AWS Lambda**
 
-<p align="center">
-  <img src="/api/placeholder/800/400" alt="BERTify Architecture" width="800"/>
-</p>
+A compact prototype of extractive question answering using a fine-tuned MobileBERT model and an AWS Lambda container handler. The code illustrates how an HTTP request can pass a question and context to a model and return an extracted answer.
 
-Transform any text into intelligent answers with enterprise-grade NLP. BERTify combines the power of BERT language models with serverless architecture to deliver lightning-fast, scalable question-answering capabilities.
+> **Project status (October 2026):** Historic educational prototype. The repository has **not** been revalidated for deployment, accuracy, latency, scale, or security. It is **not** presented as production-ready.
 
-## 🌟 Why BERTify?
+## Repository map
 
-- **Zero Infrastructure Management**: Fully serverless architecture on AWS Lambda
-- **Production-Ready Performance**: ~220ms response time for warm invocations
-- **Enterprise Scalability**: Auto-scales to thousands of concurrent requests
-- **Cost-Effective**: Pay only for actual usage, no idle servers
-- **Modern Tech Stack**: Docker + AWS Lambda + HuggingFace Transformers
+| File | Purpose |
+| --- | --- |
+| [`handler.py`](handler.py) | Lambda entry point, model loading and text-answer extraction |
+| [`get_model.py`](get_model.py) | Downloads the MobileBERT model and tokenizer into `./model` |
+| [`dockerfile`](dockerfile) | Legacy Python 3.8 Lambda container image |
+| [`requirements.txt`](requirements.txt) | Historical PyTorch / Transformers dependency pins |
+| [`serverless.yml`](serverless.yml) | Historical Serverless framework deployment configuration |
 
-## 🚀 Quick Start
+## Intended flow
 
-### Prerequisites
-
-```bash
-# Install required tools
-npm install -g serverless
-pip install aws-cli
-# Configure AWS credentials
-aws configure
+```text
+HTTP request → API Gateway → Lambda handler
+                                  ↓
+                         MobileBERT + context
+                                  ↓
+                             JSON answer
 ```
 
-### Deploy Your Own Instance
-
-```bash
-# Clone the repository
-git clone https://github.com/MOSSAWIII/bertify
-cd bertify
-
-# Download BERT model
-python3 get_model.py
-
-# Build and deploy
-docker build -t bertify .
-serverless deploy
-```
-
-## 💡 Usage Example
-
-```python
-import requests
-import json
-
-API_ENDPOINT = "https://your-api-url/qa"
-
-# Example question
-payload = {
-    "context": """
-    BERTify is a serverless question-answering engine that leverages 
-    BERT language models to provide instant answers from any given text. 
-    It can handle thousands of concurrent requests with sub-second latency.
-    """,
-    "question": "What is BERTify's main capability?"
-}
-
-# Send request
-response = requests.post(API_ENDPOINT, json=payload)
-answer = response.json()['answer']
-print(f"Answer: {answer}")
-```
-
-## 🔧 Architecture
-
-<p align="center">
-  <img src="/api/placeholder/800/400" alt="BERTify Architecture" width="800"/>
-</p>
-
-1. **API Gateway** receives HTTPS requests
-2. **AWS Lambda** with custom Docker container processes requests
-3. **BERT Model** performs question-answering inference
-4. **Auto-scaling** handles traffic spikes seamlessly
-
-## 📊 Performance Metrics
-
-| Metric | Value |
-|--------|--------|
-| Cold Start | ~6.7s |
-| Warm Response | ~220ms |
-| Max Concurrent Requests | Auto-scaling |
-| Memory Usage | 5GB |
-| Max Context Length | 512 tokens |
-
-## 🛠️ Configuration
-
-Customize your deployment in `serverless.yml`:
-
-```yaml
-provider:
-  name: aws
-  region: eu-central-1
-  memorySize: 5120
-  timeout: 30
-
-functions:
-  questionanswering:
-    image: ${ECR_IMAGE_URL}
-    events:
-      - http:
-          path: qa
-          method: post
-```
-
-## 📘 API Documentation
-
-### POST /qa
+The Python handler expects `event["body"]` to be a JSON string with a question and a context:
 
 ```json
 {
-  "context": "Your text content here...",
-  "question": "Your question about the context..."
+  "question": "What does BERTify demonstrate?",
+  "context": "BERTify is a demonstration of extractive question answering using a Lambda container."
 }
 ```
 
-Response:
-```json
-{
-  "answer": "Extracted answer from context",
-  "confidence": 0.95,
-  "latency": "123ms"
-}
-```
+Its current success response contains the extracted `answer` only. It does **not** return a measured confidence score or processing latency.
 
-## 🔒 Security
+## Historical setup (not a tested quick start)
 
-- API Gateway authentication support
-- AWS IAM role-based access control
-- Docker container security scanning
-- Input validation and sanitization
-
-## 🌐 Use Cases
-
-- **Customer Support**: Automate FAQ responses
-- **Document Analysis**: Extract insights from large documents
-- **Research**: Analyze scientific papers and reports
-- **Education**: Create interactive learning systems
-- **Content Management**: Enhance content search and retrieval
-
-## 👥 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 🧪 Running Tests
+Clone the **actual** repository:
 
 ```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Run tests
-python -m pytest tests/
+git clone https://github.com/MOSSAWIII/BERTify-Serverless-Question-Answering-Engine.git
+cd BERTify-Serverless-Question-Answering-Engine
 ```
 
-## 🌟 Star History
+The code then expects a local `model/` directory. `get_model.py` downloads `mrm8488/mobilebert-uncased-finetuned-squadv2` and its tokenizer, but it relies on historical dependencies and unverified external compatibility.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=MOSSAWIII/bertify&type=Date)](https://star-history.com/#MOSSAWIII/bertify&Date)
+**Do not run `serverless deploy` unchanged.** The committed `serverless.yml` references an account-specific ECR digest, while the Docker image and dependencies use old versions. A separate deployment refresh is required, including controlled credentials, updated dependencies, local tests and a new registry/image configuration.
 
-## 👤 Author
+## What remains unverified
 
-**Mohamed Amine EL MOUSSAOUI**  
-ML Engineer & Cloud Architecture Specialist
+- Answer accuracy, handling of impossible questions, maximum input length and model/tokenizer compatibility.
+- Cold and warm latency, throughput, concurrency and operating costs.
+- Authentication, rate limiting, request validation, error handling and container scanning.
+- Reproducibility of model download, image build and deployment on current tooling.
 
-[![GitHub Follow](https://img.shields.io/github/followers/MOSSAWIII?style=social)](https://github.com/MOSSAWIII)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue)](https://www.linkedin.com/in/medaminelmoussaoui/)
+This repository does **not** include a reproducible benchmark or test suite establishing these properties. No fabricated performance figures are published here.
 
-## 📄 License
+## Future improvements
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+A meaningful next iteration would add a small CPU-only local test harness, pinned compatible dependencies, explicit model provenance, automated tests, an example input/output and a fresh container build. Any new performance claim should be accompanied by the measurement environment and data.
 
----
+## Attribution and reuse
 
-<p align="center">
-  <a href="https://github.com/MOSSAWIII/bertify/issues">Report Bug</a> ·
-  <a href="https://github.com/MOSSAWIII/bertify/issues">Request Feature</a>
-</p>
-
-<p align="center">If you find this project useful, please consider giving it a ⭐️!</p>
+Model provenance: [`mrm8488/mobilebert-uncased-finetuned-squadv2`](https://huggingface.co/mrm8488/mobilebert-uncased-finetuned-squadv2). Check the model and dependency licenses separately. **No repository-level reuse license is asserted here until a license file is added.**
