@@ -1,3 +1,7 @@
+> **Project status (October 2026):** This repository is a serverless BERT question-answering prototype, **not a verified production system**. The latency, throughput and scaling figures below are not accompanied by reproducible benchmarks. The README includes placeholder images and a stale clone URL, and `serverless.yml` references an AWS-account-specific container image. A working deployment, independent performance verification and generally reusable setup instructions have **not** been confirmed.
+
+---
+
 # 🧠 BERTify: Serverless Question-Answering Engine
 
 [![AWS Lambda](https://img.shields.io/badge/AWS-Lambda-orange.svg)](https://aws.amazon.com/lambda/)
